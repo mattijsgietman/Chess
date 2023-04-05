@@ -5,6 +5,8 @@ from const import *
 from game import Game
 from square import Square
 from move import Move
+from piece import *
+from board import *
 
 class Main:
 
@@ -44,6 +46,7 @@ class Main:
 
                     if board.squares[clicked_row][clicked_col].has_piece():
                         piece = board.squares[clicked_row][clicked_col].piece
+
                         if piece.color == game.next_player:
                             board.calc_moves(piece, clicked_row, clicked_col, bool=True)
                             dragger.save_initial(event.pos)
@@ -81,12 +84,23 @@ class Main:
                         final = Square(released_row, released_col)
                         move = Move(initial, final)
 
+                        if isinstance(dragger.piece, Pawn):
+                            board.set_true_en_passant(dragger.piece)  
+
                         if board.valid_move(dragger.piece, move):
-                            board.move(dragger.piece, move)
-                            game.show_background(screen)
-                            game.show_last_move(screen)
-                            game.show_pieces(screen)
-                            game.next_turn()
+                            if isinstance(dragger.piece, Pawn) and board.check_promotion(dragger.piece, move.final):
+                                new_piece = board.promote_pawn(dragger.piece, move.final)
+                                board.set_piece(dragger.piece, move.final, move.initial, new_piece)
+                                game.show_background(screen)
+                                game.show_last_move(screen)
+                                game.show_pieces(screen)
+                                game.next_turn()
+                            else:            
+                                board.move(dragger.piece, move)
+                                game.show_background(screen)
+                                game.show_last_move(screen)
+                                game.show_pieces(screen)
+                                game.next_turn()
 
                     dragger.undrag_piece()
                 elif event.type == pygame.KEYDOWN:
