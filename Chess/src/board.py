@@ -135,7 +135,6 @@ class Board:
             Calculate all the possible (valid) moves of a specific piece on a specific position
         '''
 
-
         def knight_moves():
             # at max 8 possible moves
             possible_moves = [
